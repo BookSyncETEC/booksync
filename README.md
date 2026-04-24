@@ -1,6 +1,8 @@
 # BookSync
 Site do BookSync, ferramenta para organizar empréstimos e devolvimentos da biblioteca da ETEC.
 
+(Login: email@admin.com | admin222)
+
 ![alt text](telaexemplo)
 
 Nesse site é possivel:
