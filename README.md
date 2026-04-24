@@ -11,3 +11,7 @@ Nesse site é possivel:
 - Visualizar todos os registros já feitos nesse dispositivo;
 - Salvar a lista de registros como um arquivo JSON;
 - Filtrar lista de registros para certos requisitos.
+
+- Ver catálogo de livros disponiveis e indisponiveis;
+- Buscar livros;
+- Fazer denuncias e reclamações.
