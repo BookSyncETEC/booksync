@@ -205,6 +205,27 @@
             color: #bd52fa;
             transform: translateY(-5px);
         }
+        .conteudo-expansivel {
+            display: none;
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            text-align: left;
+            color: #333;
+        }
+
+        .conteudo-expansivel.ativo {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
     </style>
 </head>
 <body>
@@ -212,18 +233,29 @@
 <nav>
     <img src="logo.png" style="width: 80px;">
     <ul class="nav-links">
-        <li><a href="catalogo.html"><i class="fas fa-book-open"></i> Catálogo ▾</a></li>
-        <li><a href="#"><i class="fas fa-hand-holding-heart"></i> Como retirar ▾</a></li>
-        <li><a href="#"><i class="fas fa-list-check"></i> Regras</a></li>
+        <li><a href="catalogo.html"><i class="fas fa-book-open"></i> Catálogo</a></li>
+        <li>
+            <a href="#" onclick="toggleCaixa(event, 'box-retirar')"><i class="fas fa-hand-holding-heart"></i> Como retirar ▾</a>
+        </li>
+        <li>
+            <a href="#" onclick="toggleCaixa(event, 'box-regras')"><i class="fas fa-list-check"></i> Regras ▾</a>
+        </li>
     </ul>
     <div class="admin-link" id="auth-area">
-    <a href="login.html"><i class="fas fa-user-tie"></i> Área do professor</a>
+        <a href="login.html"><i class="fas fa-user-tie"></i> Área do professor</a>
+    </div>
+</nav>
+
+<div id="box-retirar" class="conteudo-expansivel" style="position: absolute; left: 5%; right: 5%; z-index: 100;">
+    <h3>Como Retirar</h3>
+    <p>Hello World</p>
 </div>
 
+<div id="box-regras" class="conteudo-expansivel" style="position: absolute; left: 5%; right: 5%; z-index: 100;">
+    <h3>Regras</h3>
+    <p>Hello World</p>
+</div>
 
-
-
-</nav>
 
 <header class="hero-section">
     <div class="carousel-3d">
@@ -300,7 +332,8 @@ function ajustarAcesso() {
         }
         if (authArea) {
             authArea.innerHTML = `
-                <a href="registros.html" style="margin-right: 15px;"><i class="fas fa- chalkboard-teacher"></i> Painel</a>
+                <a href="registros.html" style="margin-right: 15px;"><i class="fas fa-chalkboard-teacher"></i> Painel</a>
+                <a href="denuncias.html" style="margin-right: 15px;"><i class="fas fa-exclamation-triangle"></i> Denúncias</a>
                 <a href="#" onclick="logout()" style="color: red;"><i class="fas fa-sign-out-alt"></i> Sair</a>
             `;
         }
@@ -319,6 +352,25 @@ setInterval(() => {
     currentIndex = (currentIndex + 1) % slides.length;
     updateCarousel();
 }, 3000);
+
+function toggleCaixa(event, id) {
+    event.preventDefault();
+    
+    document.querySelectorAll('.conteudo-expansivel').forEach(caixa => {
+        if (caixa.id !== id) caixa.classList.remove('ativo');
+    });
+
+    const alvo = document.getElementById(id);
+    alvo.classList.toggle('ativo');
+}
+
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.nav-links') && !e.target.closest('.conteudo-expansivel')) {
+        document.querySelectorAll('.conteudo-expansivel').forEach(c => c.classList.remove('ativo'));
+    }
+});
+
+
 
 </script>
 
