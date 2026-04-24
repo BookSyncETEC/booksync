@@ -56,7 +56,11 @@ select {
         <datalist id="listaNomes"></datalist>
 
         <label for="sala">Sala</label><input type="text" id="sala" placeholder="EX: 2DS" required>
-        <label for="livro">Livro</label><input type="text" id="livro" placeholder="EX: O Livro" required>
+        <label for="livro">Livro</label>
+        <input type="text" id="livro" placeholder="EX: O Livro" list="listaCatalogo" required>
+
+        <datalist id="listaCatalogo"></datalist>
+
         
         <label for="data">Data</label>
         <input type="date" id="data" >
@@ -271,6 +275,46 @@ function carregarDados() {
                     datalist.appendChild(option);
                 });
             }
+
+            function atualizarSugestoesCatalogo() {
+                const titulosCatalogo = [
+                    "Jojo's Bizarre Adventure",
+                    "Moby Dick",
+                    "Dom Quixote",
+                    "O Pequeno Príncipe",
+                    "1984",
+                    "Memórias Póstumas de Brás Cubas",
+                    "A Moreninha",
+                    "O Uruguai",
+                    "Lira dos Vinte Anos",
+                    "O Guarani"
+                ];
+
+                const datalist = document.getElementById("listaCatalogo");
+                datalist.innerHTML = "";
+
+                titulosCatalogo.forEach(titulo => {
+                    let option = document.createElement("option");
+                    option.value = titulo;
+                    datalist.appendChild(option);
+                });
+            }
+
+            function carregarDados() {
+                renderizarTabela();
+                atualizarSugestoesCatalogo();
+                
+                const livroAuto = localStorage.getItem("livroParaEmprestar");
+                if (livroAuto) {
+                    const campoLivro = document.getElementById("livro");
+                    if (campoLivro) {
+                        campoLivro.value = livroAuto;
+                        document.getElementById("nome").focus();
+                    }
+                    localStorage.removeItem("livroParaEmprestar");
+                }
+            }
+
 
 
     </script>
