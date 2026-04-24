@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/light.css">
+	<style>
+		
+table tr:nth-child(even) {
+	background-color:#92d197;
+}
+table tr:nth-child(odd) {
+	background-color:#a8e3ac;
+}
+
+hr {
+	border: black solid 1px;
+}
+
+input {
+	background-color:#a8e3ac;
+	border: #92d197 solid 2px;
+	width: 95%;
+}
+select {
+	background-color:#a595c2;
+	border: #7964a1 solid 2px;
+}
+
+	</style>
+
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>BookSync | Login</title>
+	<link rel="icon" type="image/x-icon" href="icone.ico">
+</head>
+<body style="background-color: #caedcb;">
+
+	<a href="index.html"><button type="button" style="background-color: #a595c2; color:white; font-size: 15px;">Voltar para inicio</button></a>
+
+	<div style="height: 80vh; width: 50vw; background-color: #a595c2; margin: auto; border-radius: 50px; margin-top: 2%;
+	background-image: linear-gradient(0deg, #a8e3ac 81%, #a595c2 50%);">
+		<h1 style="text-align: center; padding: 2%;">Login</h1>
+		<hr>
+
+		<div style="padding: 2%;"><label for="email">Insira o Email:</label><input type="text" id="email" placeholder="Email" required></div>
+
+		<div style="padding: 2%;"><label for="senha">Insira a senha:</label><input type="password" id="senha" placeholder="Senha" required></div>
+
+		<div style="padding: 3%;">
+   			 <button type="button" id="btnEntrar" style="background-color: #a595c2; color:white;">Entrar</button>
+		</div>
+
+		<script>
+					    
+			const _0x4d1e = "b28e0a9c12c9fd6411ca8aa9324757d8738724c1b2965bdc9beb1409f481d490"; 
+			const _0x9f2a = "751d5c3fa7f2cd2691d724db14f043c3fa83ca1d7cba0266b1472d9d81ff595d";
+
+			async function _0x5b3c(s) {
+			    const b = new TextEncoder().encode(s);
+			    const h = await crypto.subtle.digest('SHA-256', b);
+			    return Array.from(new Uint8Array(h)).map(x => x.toString(16).padStart(2, '0')).join('');
+			}
+
+			async function validarLogin() {
+			    const email = document.getElementById('email').value.trim().toLowerCase();
+			    const senha = document.getElementById('senha').value.trim();
+			    
+			    if (await _0x5b3c(email) === _0x4d1e && await _0x5b3c(senha) === _0x9f2a) {
+			       
+			        sessionStorage.setItem("logado", "true");
+			        window.location.href = "catalogo.html";
+			    } else {
+			        alert("Credenciais incorretas/não foram digitadas");
+			    }
+			}
+
+
+			
+			document.getElementById('btnEntrar').addEventListener('click', (e) => {
+			    e.preventDefault();
+			    validarLogin();
+			});
+
+		
+			document.addEventListener('keydown', (e) => {
+			    if (e.key === 'Enter') {
+			        validarLogin();
+			    }
+			});
+
+		</script>
+
+
+
+	</div>
+
+</body>
+</html>

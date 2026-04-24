@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/light.css">
+	<style>
+		
+table tr:nth-child(even) {
+	background-color:#92d197;
+}
+table tr:nth-child(odd) {
+	background-color:#a8e3ac;
+}
+
+hr {
+	border: black solid 1px;
+}
+
+input {
+	background-color:#a8e3ac;
+	border: #92d197 solid 2px;
+}
+select {
+	background-color:#a595c2;
+	border: #7964a1 solid 2px;
+}
+
+	</style>
+	
+    <meta charset="utf-8">
+    <title>BookSync | Registrar</title>
+    <link rel="icon" type="image/x-icon" href="icone.ico">
+</head>
+<body style="background-color: #caedcb;">
+
+    <a href="index.html"><button type="button" style="background-color: #a595c2; color:white; font-size: 15px;">Voltar para inicio</button></a>
+    <br>
+    <a href="catalogo.html"><button type="button" style="background-color: #a595c2; color:white; font-size: 15px;">Ir para o catálogo</button></a>
+
+	<div>
+	<img src="logo.png" style="width: 160px; display: block; margin: auto; ">
+	<header style="background-color: #e9b5ff; padding: 1%; border-radius: 30px; display: flex;">
+    <h1 style="text-align: left; margin: auto;">BookSync | Editor de Registros</h1> 
+    </header>
+    <p>Página para gerenciar todos os registros já feitos</p>
+    <form id="bookForm">
+        <label for="nome">Nome</label> <input type="text" id="nome" placeholder="EX: Leitor da Silva" list="listaNomes" required>
+
+        <datalist id="listaNomes"></datalist>
+
+        <label for="sala">Sala</label><input type="text" id="sala" placeholder="EX: 2DS" required>
+        <label for="livro">Livro</label><input type="text" id="livro" placeholder="EX: O Livro" required>
+        
+        <label for="data">Data</label>
+        <input type="date" id="data" >
+        
+        <label for="hora">Horário</label>
+        <input type="time" id="hora">
+        
+        <input value="Devolução" type="radio" name="troca" id="dev"> <label for="dev" style="display:inline">Devolução</label>
+        <input value="Empréstimo" type="radio" name="troca" id="emp" checked> <label for="emp" style="display:inline">Empréstimo</label>
+        
+        <br><br>
+        <button type="button" onclick="adicionarRegistro()" style="background-color: #6d2182; color:white";>Registrar e Salvar</button>
+    </form>
+
+    <hr>
+
+
+
+    <h1>Registros</h1>
+    
+    <label for="filtro">Filtro:</label>
+    <select id="filtro" onchange="renderizarTabela()">
+        <option value="todos">Todos</option>
+        <option value="Devolução">Devolução</option>
+        <option value="Empréstimo">Empréstimo</option>
+    </select>
+
+    <label for="busca">Pesquisar por Nome:</label>
+    <input type="text" id="busca" onkeyup="renderizarTabela()" style="background-color:#a595c2; border: #7964a1 solid 2px;">
+
+    <table>
+        <thead>
+            <tr style="background-color: #6d2182; color: white;">
+                <th>Data/Hora</th>
+                <th>Nome</th>
+                <th>Sala</th>
+                <th>Livro</th>
+                <th>Operação</th>
+                <th>Remover</th>
+            </tr>
+        </thead>
+        <tbody id="corpoTabela"></tbody>
+    </table>
+
+    <button type="button" onclick="exportarJSON()" style="background-color: #a595c2; color:white; font-size: 15px;">Exportar os registros em forma de JSON</button>
+
+
+    <hr>
+
+    <div style="background-color: #a8e3ac; padding: 5px; border-radius: 25px;">
+    <p> Ajuda: </p>
+    <p>- Os dados precisam ser preenchidos, se não, um erro ocorre.</p>
+    <p>- Se a data ou/e hora não for preenchida(s), a data/hora que irá para a tabela será a data/hora atual.</p>
+    <p>- Se precisa deletar um registro, peça a senha para um Admin.</p>
+    <p>- A tabela é salva localmente, ou seja, os dados são diferentes para cada dispositivo.</p>
+	</div>
+
+	</div>
+
+    <script>
+
+        if (sessionStorage.getItem("logado") !== "true") {
+            alert("Acesso negado! Por favor, faça login.");
+            window.location.href = "login.html"; // Ajuste para o nome do seu arquivo de login
+        }
+
+        document.addEventListener("DOMContentLoaded", carregarDados);
+
+        function adicionarRegistro() {
+            let dataValor = document.getElementById("data").value;
+            let horaValor = document.getElementById("hora").value;
+            
+            const agora = new Date();
+
+            if (!dataValor) {
+                dataValor = agora.toISOString().split('T')[0];
+            }
+            if (!horaValor) {
+                horaValor = agora.toTimeString().split(' ')[0].substring(0, 5);
+            }
+
+            const registro = {
+                id: Date.now(),
+                data: dataValor,
+                hora: horaValor,
+                nome: document.getElementById("nome").value,
+                sala: document.getElementById("sala").value,
+                livro: document.getElementById("livro").value,
+                troca: document.querySelector('input[name="troca"]:checked').value
+            };
+
+            if (!registro.nome || !registro.livro) return alert("Preencha os campos");
+
+            const lista = JSON.parse(localStorage.getItem("registros") || "[]");
+            lista.push(registro);
+            localStorage.setItem("registros", JSON.stringify(lista));
+
+            renderizarTabela();
+            document.getElementById("bookForm").reset();
+        }
+
+function carregarDados() {
+    renderizarTabela();
+
+    const livroAuto = localStorage.getItem("livroParaEmprestar");
+
+    if (livroAuto) {
+        const campoLivro = document.getElementById("livro");
+        if (campoLivro) {
+            campoLivro.value = livroAuto;
+            
+            document.getElementById("nome").focus();
+        }
+
+        localStorage.removeItem("livroParaEmprestar");
+    }
+}
+
+
+        function renderizarTabela() {
+    const lista = JSON.parse(localStorage.getItem("registros") || "[]");
+    const filtro = document.getElementById("filtro").value;
+    const busca = document.getElementById("busca").value.toLowerCase(); // Captura a busca
+    const corpo = document.getElementById("corpoTabela");
+    corpo.innerHTML = ""; 
+
+    const hoje = new Date();
+
+    const listaProcessada = lista
+        .filter(item => filtro === "todos" ? true : item.troca === filtro)
+        .filter(item => item.nome.toLowerCase().includes(busca))
+        .reverse(); 
+
+    listaProcessada.forEach((item) => {
+        let linha = corpo.insertRow();
+        let dataBR = item.data.split('-').reverse().join('/');
+        
+        let avisoAtraso = "";
+        if (item.troca === "Empréstimo") {
+            const dataRegistro = new Date(`${item.data}T${item.hora}`);
+            const diferencaDias = (hoje - dataRegistro) / (1000 * 60 * 60 * 24);
+
+            if (diferencaDias >= 10) {
+                avisoAtraso = " <strong>(ATRASADO)</strong> ⚠️";
+            }
+        }
+
+        linha.insertCell(0).innerText = `${dataBR} ${item.hora}`;
+        linha.insertCell(1).innerText = item.nome;
+        linha.insertCell(2).innerText = item.sala;
+        linha.insertCell(3).innerText = item.livro;
+        
+        let celulaOperacao = linha.insertCell(4);
+        celulaOperacao.innerHTML = item.troca + avisoAtraso;
+
+        let btn = document.createElement("button");
+        btn.innerText = "Excluir";
+        btn.style.backgroundColor = "red";
+        btn.style.color = "white";
+        btn.onclick = () => removerRegistro(item.id);
+        linha.insertCell(5).appendChild(btn);
+
+        atualizarSugestoes();
+    });
+}
+
+
+
+
+        	const _0x1a2b = "462fa87c634d28d8d857f4d61050ff3a4909f0449fd19ec388aec3cfacd82d14";
+
+			async function _0x3c4d(s) {
+			    const b = new TextEncoder().encode(s);
+			    const h = await crypto.subtle.digest('SHA-256', b);
+			    return Array.from(new Uint8Array(h)).map(x => x.toString(16).padStart(2, '0')).join('');
+			}
+
+			async function removerRegistro(id) {
+			    const p = prompt("Inserir senha admin:");
+			    if (p && await _0x3c4d(p) === _0x1a2b) {
+			        let l = JSON.parse(localStorage.getItem("registros") || "[]");
+			        l = l.filter(i => i.id !== id);
+			        localStorage.setItem("registros", JSON.stringify(l));
+			        renderizarTabela();
+			    } else if (p) {
+			        alert("Senha incorreta!");
+			    }
+			}
+
+			function exportarJSON() {
+			    const lista = localStorage.getItem("registros") || "[]";
+			    const blob = new Blob([lista], { type: "application/json" });
+			    const url = URL.createObjectURL(blob);
+			    const a = document.createElement("a");
+			    a.href = url;
+			    a.download = "registros_booksync.json";
+			    a.click();
+			    URL.revokeObjectURL(url);
+			}
+
+            function atualizarSugestoes() {
+                const lista = JSON.parse(localStorage.getItem("registros") || "[]");
+                const datalist = document.getElementById("listaNomes");
+                
+                const nomesUnicos = [...new Set(lista.map(item => item.nome))].sort();
+
+                datalist.innerHTML = "";
+                
+                nomesUnicos.forEach(nome => {
+                    let option = document.createElement("option");
+                    option.value = nome;
+                    datalist.appendChild(option);
+                });
+            }
+
+
+    </script>
+</body>
+</html>

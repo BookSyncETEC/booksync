@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookSync | Detalhes do Livro</title>
+    <link rel="stylesheet" href="https://cloudflare.com">
+    <style>
+:root {
+    --verde-fundo: #8cb391;
+    --roxo-claro: #a595c2;
+    --roxo-escuro: #6d2182;
+    --roxo-banner: #b099d1;
+}
+
+body {
+    background-color: var(--verde-fundo);
+    margin: 0;
+    font-family: sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100vh;
+}
+
+header {
+    background-color: var(--roxo-banner);
+    width: 100%;
+    padding: 15px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.btn-home {
+    background-color: #1a1a1a;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 5px;
+    margin-left: 20px;
+    text-decoration: none;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    color: #1a1a1a;
+    flex-grow: 1;
+    text-align: center;
+}
+
+.menu-dots {
+    margin-right: 25px;
+    font-size: 1.5rem;
+        cursor: pointer;
+}
+
+main {
+    display: flex;
+    width: 90%;
+    max-width: 900px;
+    margin-top: 40px;
+    gap: 40px;
+    align-items: flex-start;
+}
+
+.capa-container {
+    flex: 1;
+    background: white;
+    padding: 10px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+.capa-container img {
+    width: 100%;
+    display: block;
+}
+
+.info-container {
+    flex: 1.5;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.status {
+    font-size: 1.3rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.status i { color: #00ff00; text-shadow: 0 0 5px rgba(0,0,0,0.2); }
+
+.caixa-sinopse {
+    background-color: var(--roxo-claro);
+    padding: 25px;
+    border-radius: 20px;
+    border: 2px solid #7964a1;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+    min-height: 200px;
+}
+
+.caixa-sinopse h3 { margin-top: 0; font-size: 1.4rem; }
+.caixa-sinopse p { line-height: 1.5; font-size: 0.95rem; text-align: justify; }
+
+.btn-emprestar {
+    background-color: var(--roxo-claro);
+    border: 2px solid #7964a1;
+    padding: 15px 40px;
+    border-radius: 5px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: 0.3s;
+    align-self: center;
+    font-weight: bold;
+}
+
+.btn-emprestar:hover {
+    background-color: var(--roxo-escuro);
+    color: white;
+    transform: scale(1.05);
+}
+
+@media (max-width: 768px) {
+    main { flex-direction: column; align-items: center; }
+            .capa-container { width: 250px; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="catalogo.html" class="btn-home">Voltar<i class="fas fa-home"></i></a>
+    <h1 id="titulo-livro">Título do Livro</h1>
+    <div class="menu-dots"><i class="fas fa-ellipsis-v"></i></div>
+</header>
+
+<main>
+    <div class="capa-container">
+        <img id="capa-livro" src="" alt="Capa do Livro">
+    </div>
+
+    <div class="info-container">
+        <div class="status">
+            Disponível <i class="fas fa-check-circle"></i>
+        </div>
+
+        <div class="caixa-sinopse">
+            <h3>Sinopse:</h3>
+            <p id="sinopse-livro">Carregando descrição...</p>
+        </div>
+
+        <button class="btn-emprestar" onclick="irParaRegistro()">Emprestar</button>
+    </div>
+</main>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const dadosLivro = localStorage.getItem("livroSelecionado");
+
+        if (dadosLivro) {
+            const livro = JSON.parse(dadosLivro);
+            
+            document.getElementById("titulo-livro").innerText = livro.titulo;
+            document.getElementById("capa-livro").src = livro.imagem;
+            document.getElementById("sinopse-livro").innerText = livro.sinopse;
+        } else {
+            alert("Nenhum livro selecionado!");
+            window.location.href = "catalogo.html";
+        }
+    });
+
+function irParaRegistro() {
+    const titulo = document.getElementById("titulo-livro").innerText;
+    
+    localStorage.setItem("livroParaEmprestar", titulo);
+    
+    window.location.href = "registros.html"
+}
+
+</script>
+
+</body>
+</html>

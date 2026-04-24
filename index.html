@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookSync | O caminho entre você e a leitura</title>
+    <link rel="icon" type="image/x-icon" href="icone.ico">
+    <link rel="stylesheet" href="https://cloudflare.com">
+    <style>
+        :root {
+            --verde-fundo: #caedcb;
+            --roxo-claro: #e9b5ff;
+            --roxo-medio: #a595c2;
+            --roxo-escuro: #6d2182;
+            --verde-caixa: #a8e3ac;
+        }
+
+        body {
+            background-color: var(--verde-fundo);
+            margin: 0;
+            padding: 0;
+            font-family: sans-serif;
+            overflow-x: hidden;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 5%;
+            background-color: white;
+            border-bottom: 2px solid var(--roxo-medio);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .nav-links a, .admin-link a {
+            text-decoration: none;
+            color: #4a148c;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--roxo-escuro);
+        }
+
+        .hero-section {
+            position: relative;
+            height: 650px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            background-color: var(--verde-fundo);
+            perspective: 1200px;
+        }
+
+        .carousel-3d {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1; 
+        }
+
+        .slide {
+            position: absolute;
+            width: 280px;
+            height: 400px;
+            transition: all 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            will-change: transform, opacity;
+            backface-visibility: hidden;
+        }
+
+        .slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .pos-center {
+            transform: translate3d(0, 0, 150px) scale(1.1);
+            z-index: 5;
+            opacity: 1;
+        }
+
+        .pos-left {
+            transform: translate3d(-380px, 0, -100px) rotateY(35deg) scale(0.8);
+            z-index: 3;
+            opacity: 0.4;
+        }
+
+        .pos-right {
+            transform: translate3d(380px, 0, -100px) rotateY(-35deg) scale(0.8);
+            z-index: 3;
+            opacity: 0.4;
+        }
+
+        .hero-card {
+            position: relative;
+            z-index: 10;
+            background: white;
+            padding: 40px 60px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            text-align: center; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .hero-card h1 {
+            font-size: 2.2rem;
+            color: #333;
+            margin: 0;
+        }
+
+        .btn-comecar {
+            background-color: var(--verde-caixa);
+            color: #222;
+            padding: 12px 35px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: bold;
+            border: 2px solid transparent;
+            transition: 0.4s;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-comecar:hover {
+            background-color: white;
+            border-color: var(--roxo-escuro);
+            transform: translateY(-3px);
+            box-shadow: 0 0 20px rgba(109, 33, 130, 0.5); 
+        }
+
+        .como-funciona {
+            padding: 50px 5%;
+            text-align: center;
+        }
+
+        .conteudo-flex {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            margin-top: 30px;
+            text-align: left;
+            flex-wrap: wrap;
+        }
+
+        .mockup-img {
+            flex: 1;
+            min-width: 300px;
+            border: 8px solid var(--roxo-claro);
+            border-radius: 15px;
+            background-color: white;
+        }
+
+        .texto-descritivo {
+            flex: 1;
+            min-width: 300px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        footer {
+            background-color: white;
+            padding: 50px 20px;
+            text-align: center;
+            border-top: 2px solid var(--roxo-medio);
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-top: 15px;
+        }
+
+        .social-links a {
+            font-size: 1.2rem;
+            color: var(--roxo-escuro);
+            transition: transform 0.3s, color 0.3s;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .social-links a:hover {
+            color: #bd52fa;
+            transform: translateY(-5px);
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <img src="logo.png" style="width: 80px;">
+    <ul class="nav-links">
+        <li><a href="catalogo.html"><i class="fas fa-book-open"></i> Catálogo ▾</a></li>
+        <li><a href="#"><i class="fas fa-hand-holding-heart"></i> Como retirar ▾</a></li>
+        <li><a href="#"><i class="fas fa-list-check"></i> Regras</a></li>
+    </ul>
+    <div class="admin-link" id="auth-area">
+    <a href="login.html"><i class="fas fa-user-tie"></i> Área do professor</a>
+</div>
+
+
+
+
+</nav>
+
+<header class="hero-section">
+    <div class="carousel-3d">
+        <div class="slide"><img src="https://estantediagonal.com.br" alt="Capa 1"></div>
+        <div class="slide"><img src="https://media-amazon.com" alt="Capa 2"></div>
+        <div class="slide"><img src="https://googleapis.com" alt="Capa 3"></div>
+    </div>
+
+    <div class="hero-card">
+        <h1>O caminho entre você e a leitura</h1>
+        <a href="login.html" class="btn-comecar">Comece agora</a>
+    </div>
+</header>
+
+<section class="como-funciona">
+    <h1>Como Funciona</h1>
+    <div class="conteudo-flex">
+        <div class="mockup-img">
+            <div style="padding: 20px; background: var(--roxo-claro); border-radius: 5px;">
+                <strong>BookSync Editor</strong><br>
+                <small>Interface de gerenciamento</small>
+            </div>
+        </div>
+        <div class="texto-descritivo">
+            <p>O BookSync foi desenvolvido para facilitar a conexão entre alunos e o acervo da biblioteca. Com uma interface intuitiva, você pode registrar empréstimos e devoluções em segundos.</p>
+            <p>Nossa plataforma permite que os professores acompanhem em tempo real a movimentação dos livros, garantindo que o conhecimento esteja sempre circulando de forma organizada e eficiente.</p>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <h2>BookSync | O caminho entre você e a leitura</h2>
+    <p>Siga-nos nas redes sociais:</p>
+    <div class="social-links">
+        <a href="https://www.instagram.com/booksync_" target="_blank">
+            <i class="fab fa-instagram"></i>
+            <span>Instagram</span>
+        </a>
+        <a href="https://github.com/BookSyncETEC" target="_blank">
+            <i class="fab fa-github"></i>
+            <span>GitHub</span>
+        </a>
+    </div>
+    <p>© 2026 BookSync - Todos os direitos reservados.</p>
+</footer>
+
+<script>
+    const slides = document.querySelectorAll('.slide');
+let currentIndex = 0;
+
+function updateCarousel() {
+    const n = slides.length;
+    slides.forEach((slide, index) => {
+        slide.classList.remove('pos-center', 'pos-left', 'pos-right');
+        if (index === currentIndex) {
+            slide.classList.add('pos-center');
+        } else if (index === (currentIndex + 1) % n) {
+            slide.classList.add('pos-right');
+        } else {
+            slide.classList.add('pos-left');
+        }
+    });
+}
+
+function ajustarAcesso() {
+    const estaLogado = sessionStorage.getItem("logado") === "true";
+    const btnComecar = document.querySelector('.btn-comecar');
+    const authArea = document.getElementById('auth-area');
+
+    if (estaLogado) {
+        if (btnComecar) {
+            btnComecar.href = "registros.html";
+            btnComecar.innerText = "Ir para Registros";
+        }
+        if (authArea) {
+            authArea.innerHTML = `
+                <a href="registros.html" style="margin-right: 15px;"><i class="fas fa- chalkboard-teacher"></i> Painel</a>
+                <a href="#" onclick="logout()" style="color: red;"><i class="fas fa-sign-out-alt"></i> Sair</a>
+            `;
+        }
+    }
+}
+
+function logout() {
+    sessionStorage.removeItem("logado");
+    window.location.reload();
+}
+
+updateCarousel();
+ajustarAcesso();
+
+setInterval(() => {
+    currentIndex = (currentIndex + 1) % slides.length;
+    updateCarousel();
+}, 3000);
+
+</script>
+
+</body>
+</html>
