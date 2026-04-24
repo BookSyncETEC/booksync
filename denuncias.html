@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Denúncias - LocalStorage</title>
+    <link rel="icon" type="image/x-icon" href="icone.ico">
+    <style>
+        .btn-home { font-size: 1.5rem; color: #333; text-decoration: none;
+        padding:1%; }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background-color: #caedcb; font-family: sans-serif; display: flex; justify-content: center; min-height: 100vh; }
+        .container { background-color: #89a882; width: 1200px; min-height: 100vh; display: flex; flex-direction: column; box-shadow: 0 0 50px rgba(0,0,0,0.2); }
+        header { background-color: #ffffff; padding: 40px; text-align: center; font-size: 32px; font-weight: bold; color: #c300ff; text-transform: uppercase; letter-spacing: 2px; }
+        .content { padding: 60px 100px; flex-grow: 1; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 50px; }
+        .full-width { grid-column: span 2; }
+        label { display: block; font-size: 20px; margin-bottom: 12px; font-weight: 600; color: #1a1a1a; }
+        input, textarea { width: 100%; background-color: #ffffff; border: 3px solid #7a9474; border-radius: 12px; padding: 18px; font-size: 18px; outline: none; }
+        textarea { height: 250px; resize: none; }
+        .btn-submit { background-color: #720081; color: white; border: none; border-radius: 8px; padding: 20px 50px; font-size: 18px; font-weight: bold; cursor: pointer; }
+        .card { margin-top: 60px; border-radius: 30px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.15); }
+        .red-card { background-color: #c93a3e; }
+        .white-card { background-color: white; border: 4px solid #b22222; }
+        .card-header { background-color: #b22222; color: white; padding: 20px; text-align: center; font-size: 22px; font-weight: bold; }
+        .scroll-wrapper { display: flex; align-items: center; padding: 20px; }
+        .items-scroll { display: flex; gap: 30px; overflow-x: auto; scroll-behavior: smooth; padding: 25px; width: 100%; }
+        .items-scroll::-webkit-scrollbar { display: none; }
+        .zoom-item { min-width: 150px; height: 220px; background-color: #ddd; border-radius: 12px; object-fit: cover; transition: transform 0.3s ease; cursor: pointer; }
+        .zoom-item:hover { transform: scale(1.1); }
+        .student-photo { min-width: 150px; height: 150px; border-radius: 50%; border: 4px solid #b22222; object-fit: cover; }
+        .arrow { color: white; font-size: 50px; cursor: pointer; padding: 0 15px; user-select: none; }
+        .arrow-dark { color: #b22222; }
+        .footer-info { padding: 40px 60px; line-height: 2; font-size: 20px; color: #333; border-top: 2px solid #eee; }
+    </style>
+</head>
+<body>
+
+
+
+<div class="container">
+    
+    <header>Denúncias e Pendências</header>
+    <a href="index.html" class="btn-home">Voltar<i class="fas fa-home"></i></a>
+
+    <div class="content">
+        <div class="form-grid">
+            <label class="full-width">Preencha com os dados do estudante:</label>
+            <input type="text" id="inNome" placeholder="Nome Completo">
+            <input type="text" id="inTurma" placeholder="Turma / Módulo">
+            <input type="number" id="inRM" placeholder="RM" 
+    oninput="if(this.value.length > 5) this.value = this.value.slice(0,5);" 
+    onkeypress="return event.charCode >= 48 && event.charCode <= 57">
+            <input type="text" id="inPena" placeholder="Duração da pena">
+            <input type="date" id="inData">
+            <input type="time" id="inHora">
+            <textarea class="full-width" id="inMotivo" placeholder="Descreva o ocorrido em detalhes..."></textarea>
+            <div class="full-width">
+                <button class="btn-submit" onclick="registrarDenuncia()">REALIZAR DENÚNCIA</button>
+            </div>
+        </div>
+
+        <div class="card red-card">
+            <div class="card-header">Livros com atraso de devolução</div>
+            <div class="scroll-wrapper">
+                <span class="arrow" onclick="document.getElementById('bookScroll').scrollBy(-300, 0)">❮</span>
+                <div class="items-scroll" id="bookScroll">
+                    <img src="https://placeholder.com" class="zoom-item">
+                    <img src="https://placeholder.com" class="zoom-item">
+                    <img src="https://placeholder.com" class="zoom-item">
+                </div>
+                <span class="arrow" onclick="document.getElementById('bookScroll').scrollBy(300, 0)">❯</span>
+            </div>
+        </div>
+
+        <div class="card white-card">
+            <div class="card-header">Alunos Penalizados</div>
+            <div class="scroll-wrapper">
+                <span class="arrow arrow-dark" onclick="document.getElementById('penaltyScroll').scrollBy(-300, 0)">❮</span>
+                <div class="items-scroll" id="penaltyScroll"></div>
+                <span class="arrow arrow-dark" onclick="document.getElementById('penaltyScroll').scrollBy(300, 0)">❯</span>
+            </div>
+            <div class="footer-info" id="displayInfo">
+                <p>Clique em um aluno para ver os detalhes.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+   if (sessionStorage.getItem("logado") !== "true") {
+    alert("Acesso negado! Por favor, faça login.");
+    window.location.href = "login.html";
+}
+
+window.onload = () => {
+    carregarDenuncias();
+    carregarLivrosAtrasados();
+};
+
+function registrarDenuncia() {
+    const rmValue = document.getElementById('inRM').value;
+
+    if (rmValue.length !== 5) {
+        return alert("O RM deve ter exatamente 5 dígitos!");
+    }
+
+    const dados = {
+        nome: document.getElementById('inNome').value,
+        turma: document.getElementById('inTurma').value,
+        rm: rmValue,
+        pena: document.getElementById('inPena').value,
+        motivo: document.getElementById('inMotivo').value,
+        id: Date.now()
+    };
+
+    if (!dados.nome || !dados.rm) return alert("Preencha ao menos Nome e RM!");
+
+    let denuncias = JSON.parse(localStorage.getItem('denuncias')) || [];
+    denuncias.push(dados);
+    localStorage.setItem('denuncias', JSON.stringify(denuncias));
+
+    adicionarFotoNaLista(dados);
+    limparCampos();
+    alert("Denúncia registrada!");
+}
+
+function carregarDenuncias() {
+    let denuncias = JSON.parse(localStorage.getItem('denuncias')) || [];
+    denuncias.forEach(adicionarFotoNaLista);
+}
+
+function carregarLivrosAtrasados() {
+    const registros = JSON.parse(localStorage.getItem('registros') || "[]");
+    const scrollLivros = document.getElementById('bookScroll');
+    scrollLivros.innerHTML = "";
+
+    const livrosDB = [
+        { titulo: "Jojo's Bizarre Adventure", imagem: "https://m.media-amazon.com/images/I/91exhmNIP1L._UF1000,1000_QL80_.jpg" },
+        { titulo: "Moby Dick", imagem: "https://tocalivros.s3.amazonaws.com/images/audiolivros/350/m/o/moby-dick-herman-melville-1048663.jpg" },
+        { titulo: "Dom Quixote", imagem: "https://m.media-amazon.com/images/I/81LRaTV7JAL._UF1000,1000_QL80_.jpg" },
+        { titulo: "O Pequeno Príncipe", imagem: "https://m.media-amazon.com/images/I/71LJ4k-k9hL.jpg" },
+        { titulo: "1984", imagem: "https://m.media-amazon.com/images/I/81l3pUGbT8L._AC_UF1000,1000_QL80_.jpg" },
+        { titulo: "Memórias Póstumas de Brás Cubas", imagem: "https://m.media-amazon.com/images/I/91GAAzBixYL._UF1000,1000_QL80_.jpg" },
+        { titulo: "A Moreninha", imagem: "https://http2.mlstatic.com/D_NQ_NP_805453-MLA82754978710_032025-O.webp" },
+        { titulo: "O Uruguai", imagem: "https://m.media-amazon.com/images/I/51XuSfWfCBL._AC_UF1000,1000_QL80_.jpg" },
+        { titulo: "Lira dos Vinte Anos", imagem: "https://m.media-amazon.com/images/I/51i+RLc6cPL._AC_UF1000,1000_QL80_.jpg" },
+        { titulo: "O Guarani", imagem: "http://m.media-amazon.com/images/I/7125-MeD+KL._AC_UF1000,1000_QL80_.jpg" }
+    ];
+
+    const hoje = new Date();
+    const statusLivros = {};
+    
+    registros.forEach(reg => {
+        statusLivros[reg.livro] = reg;
+    });
+
+    const livrosAtrasados = Object.values(statusLivros).filter(reg => {
+        const livroNoCatalogo = livrosDB.find(l => l.titulo === reg.livro);
+        
+        if (livroNoCatalogo && reg.troca === "Empréstimo") {
+            const dataReg = new Date(`${reg.data}T${reg.hora}`);
+            const diffDias = Math.floor((hoje - dataReg) / (1000 * 60 * 60 * 24));
+            return diffDias >= 10;
+        }
+        return false;
+    });
+
+    if (livrosAtrasados.length === 0) {
+        scrollLivros.innerHTML = "<p style='color: white; padding: 20px;'>Nenhum livro atrasado.</p>";
+        return;
+    }
+
+    livrosAtrasados.forEach(reg => {
+        const dadosLivro = livrosDB.find(l => l.titulo === reg.livro);
+        const item = document.createElement('div');
+        item.style.minWidth = "150px";
+        item.style.textAlign = "center";
+        item.innerHTML = `
+            <img src="${dadosLivro.imagem}" class="zoom-item" style="width: 150px; height: 220px; border: 3px solid #b22222; border-radius: 12px; object-fit: cover;">
+            <p style="color: white; font-size: 14px; margin-top: 5px; font-weight: bold;">${reg.nome}</p>
+        `;
+        scrollLivros.appendChild(item);
+    });
+}
+
+
+
+function adicionarFotoNaLista(dados) {
+    const scroll = document.getElementById('penaltyScroll');
+    
+    const iniciais = dados.nome
+        .split(' ')
+        .map(n => n[0])
+        .join('')
+        .toUpperCase()
+        .slice(0, 2);
+    
+    const div = document.createElement('div');
+    div.className = "zoom-item student-photo";
+    
+    Object.assign(div.style, {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: "#720081",
+        color: "white",
+        fontSize: "40px",
+        fontWeight: "bold",
+        minWidth: "150px",
+        height: "150px",
+        borderRadius: "50%",
+        cursor: "pointer"
+    });
+    
+    div.innerText = iniciais;
+    div.title = dados.nome;
+    div.onclick = () => exibirInfo(dados);
+    
+    scroll.appendChild(div);
+}
+
+
+
+
+function exibirInfo(dados) {
+    document.getElementById('displayInfo').innerHTML = `
+        <p><strong>Nome:</strong> ${dados.nome}</p>
+        <p><strong>Turma:</strong> ${dados.turma}</p>
+        <p><strong>RM:</strong> ${dados.rm}</p>
+        <p><strong>Status:</strong> Penalizado até: ${dados.pena}</p>
+        <p><strong>Motivo:</strong> ${dados.motivo}</p>
+        <button onclick="removerDenuncia(${dados.id})" style="margin-top:10px; cursor:pointer; color:red; border:none; background:none; font-weight:bold;">[Excluir Registro]</button>
+    `;
+}
+
+function removerDenuncia(id) {
+    let denuncias = JSON.parse(localStorage.getItem('denuncias')) || [];
+    denuncias = denuncias.filter(d => d.id !== id);
+    localStorage.setItem('denuncias', JSON.stringify(denuncias));
+    location.reload();
+}
+
+function limparCampos() {
+    document.querySelectorAll('input, textarea').forEach(el => el.value = "");
+}
+
+</script>
+
+</body>
+</html>

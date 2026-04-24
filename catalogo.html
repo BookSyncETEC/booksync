@@ -129,10 +129,6 @@ margin-top: 20px;
     <i class="fas fa-ellipsis-v"></i>
 </header>
 
-<div class="search-container">
-    <i class="fas fa-search"></i>
-    <input type="text" placeholder="Pesquisa">
-</div>
 
 <section class="secao-populares">
     <h3>Populares</h3>
@@ -144,13 +140,22 @@ margin-top: 20px;
 </section>
 
 <section class="busca-genero">
-    <h3>Busca por gênero</h3>
- <select id="filtroGenero" onchange="filtrarLivros()" style="background: none; border: none; font-weight: bold; cursor:pointer;">
-        <option value="todos">Todos os gêneros ▾</option>
-        <option value="Aventura">Aventura</option>
-        <option value="Clássico">Clássico</option>
-        <option value="Ficção">Ficção</option>
-    </select>
+    <h3>Buscar Livros:</h3>
+    <div style="display: flex; gap: 15px; flex-wrap: wrap; align-items: center; margin-bottom: 20px;">
+        <select id="filtroGenero" onchange="filtrarLivros()" style="background-color: var(--roxo-escuro); border: 1px solid var(--roxo-escuro); border-radius: 5px; padding: 5px; font-weight: bold; cursor:pointer; color: white;">
+            <option value="todos">Todos os gêneros</option>
+            <option value="Aventura">Aventura</option>
+            <option value="Clássico">Clássico</option>
+            <option value="Ficção">Ficção</option>
+        </select>
+
+        <input type="text" id="pesquisaNome" onkeyup="filtrarLivros()" placeholder="Pesquisar por título..." 
+        style="background: white; border: 1px solid var(--roxo-escuro); border-radius: 5px; padding: 5px; flex-grow: 1; min-width: 200px;">
+    </div>
+
+    <div class="grid-livros" id="gridLivros"></div>
+</section>
+
 
 <div class="grid-livros" id="gridLivros">
     </div>
@@ -158,11 +163,16 @@ margin-top: 20px;
 
 <script>
 const livrosDB = [
-    { id: 1, titulo: "Jojo's Bizarre Adventure", autor: "Hirohiko Araki", genero: "Aventura", imagem: "https://estantediagonal.com.br", sinopse: "A história da família Joestar e suas lutas sobrenaturais." },
-    { id: 2, titulo: "Moby Dick", autor: "Herman Melville", genero: "Clássico", imagem: "https://media-amazon.com", sinopse: "A obsessiva jornada do Capitão Ahab contra a baleia branca." },
-    { id: 3, titulo: "Dom Quixote", autor: "Miguel de Cervantes", genero: "Clássico", imagem: "https://media-amazon.com", sinopse: "As aventuras de um fidalgo que decide ser cavaleiro." },
-    { id: 4, titulo: "O Pequeno Príncipe", autor: "Antoine de Saint-Exupéry", genero: "Ficção", imagem: "https://media-amazon.com", sinopse: "Uma fábula poética sobre amizade e amor." },
-    { id: 5, titulo: "1984", autor: "George Orwell", genero: "Ficção", imagem: "https://media-amazon.com", sinopse: "Um futuro onde o Estado controla cada pensamento." }
+    { id: 1, titulo: "Jojo's Bizarre Adventure", autor: "Hirohiko Araki", genero: "Aventura", imagem: "https://m.media-amazon.com/images/I/91exhmNIP1L._UF1000,1000_QL80_.jpg", sinopse: "A história da família Joestar e suas lutas sobrenaturais." },
+    { id: 2, titulo: "Moby Dick", autor: "Herman Melville", genero: "Clássico", imagem: "https://tocalivros.s3.amazonaws.com/images/audiolivros/350/m/o/moby-dick-herman-melville-1048663.jpg", sinopse: "Moby Dick é um romance do Romantismo estado-unidense. Publicado, pela primeira vez, em 1851, ele conta a história do capitão Ahab e sua busca obsessiva pela baleia Moby Dick. Ahab não tem uma perna, e a responsável por isso é essa temível baleia-branca. O capitão só tem um objetivo na vida: matar a baleia Moby Dick. A obra de Herman Melville apresenta características do que se convencionou chamar de Romantismo sombrio. Assim, o romance Moby Dick é marcado pela morbidez e pelo pessimismo. Mostra o ser humano como um ser irracional e falível, em oposição à vertente transcendentalista romântica." },
+    { id: 3, titulo: "Dom Quixote", autor: "Miguel de Cervantes", genero: "Clássico", imagem: "https://m.media-amazon.com/images/I/81LRaTV7JAL._UF1000,1000_QL80_.jpg", sinopse: "Dom Quixote é um romance do escritor espanhol Miguel de Cervantes. A obra foi publicada, pela primeira vez, em 1605, e consiste em uma sátira aos romances de cavalaria. Na história, o fidalgo espanhol Alonso Quixano enlouquece após ler muitos romances de cavalaria. Em busca de glória, ele decide ser um cavaleiro andante, vestido em uma armadura e montado em seu pangaré, Rocinante. Convence um camponês chamado Sancho Pança a ser seu escudeiro. O narrador revela os episódios ocorridos durante as andanças do louco Cavaleiro da Triste Figura e do ingênuo camponês Sancho Pança." },
+    { id: 4, titulo: "O Pequeno Príncipe", autor: "Antoine de Saint-Exupéry", genero: "Ficção", imagem: "https://m.media-amazon.com/images/I/71LJ4k-k9hL.jpg", sinopse: "O pequeno príncipe é um famoso livro da literatura infantil europeia. Narra acontecimentos vividos por um menino originário do asteroide B 612. Após a queda de um avião no deserto do Saara, o piloto faz amizade com essa sábia criança, que consegue ver o que os adultos são incapazes." },
+    { id: 5, titulo: "1984", autor: "George Orwell", genero: "Ficção", imagem: "https://m.media-amazon.com/images/I/81l3pUGbT8L._AC_UF1000,1000_QL80_.jpg", sinopse: "1984 é um famoso romance inglês escrito pelo autor modernista George Orwell. Publicado pela primeira vez em 1949, ele conta a história de Winston Smith, um cidadão inserido em um contexto de repressão. Ele vive na Inglaterra de 1984, chamada de Oceânia. Nesse regime totalitarista, todos são vigiados pelo Grande Irmão." },
+    { id: 6, titulo: "Memórias Póstumas de Brás Cubas", autor: "Machado de Assis", genero: "Clássico", imagem: "https://m.media-amazon.com/images/I/91GAAzBixYL._UF1000,1000_QL80_.jpg", sinopse: "“Memórias póstumas de Brás Cubas”, publicado em 1881, é uma das principais obras do escritor Machado de Assis. A publicação desse romance é considerada o marco inicial do Realismo no Brasil,  e seu autor, por consequência, é reconhecido como o pai de tal movimento em terras brasileiras." },
+    { id: 7, titulo: "A Moreninha", autor: "Joaquim Manuel", genero: "Clássico", imagem: "https://http2.mlstatic.com/D_NQ_NP_805453-MLA82754978710_032025-O.webp", sinopse: "A Moreninha é um romance do escritor brasileiro Joaquim Manuel de Macedo e um dos maiores clássicos da literatura brasileira." },
+    { id: 8, titulo: "O Uruguai", autor: "Basílio da Gama", genero: "Aventura", imagem: "https://m.media-amazon.com/images/I/51XuSfWfCBL._AC_UF1000,1000_QL80_.jpg", sinopse: "O Uraguai é uma obra de Basílio da Gama, poeta brasileiro. O livro é considerado um poema épico de 1769 que tinha o objetivo de exaltar a política do Marquês de Pombal contra os jesuítas. Utilizando a Guerra Guaranítica como tema histórico, Basílio da Gama coloca a culpa do massacre indígena nos jesuítas." },
+    { id: 9, titulo: "Lira dos Vinte Anos", autor: "Álvares de Azevedo", genero: "Clássico", imagem: "https://m.media-amazon.com/images/I/51i+RLc6cPL._AC_UF1000,1000_QL80_.jpg", sinopse: "Lira dos Vinte Anos (1853), de Álvares de Azevedo, é a principal obra do ultrarromantismo brasileiro. Publicada após a morte do autor, aos 20 anos, retrata o mal do século, caracterizado por pessimismo, morbidez, tédio e amores idealizados, com forte influência de Lord Byron e alternância entre lirismo amoroso e ironia boêmia." },
+    { id: 10, titulo: "O Guarani", autor: "José de Alencar", genero: "Aventura", imagem: "http://m.media-amazon.com/images/I/7125-MeD+KL._AC_UF1000,1000_QL80_.jpg", sinopse: "O guarani é uma obra do escritor cearense José de Alencar. De forma idealizada, esse romance conta a história de amor entre Ceci (filha de um colonizador) e Peri (indígena brasileiro). Com esse relacionamento inter-racial, o narrador cria a ideia de que o povo brasileiro é fruto do amor e da harmonia entre portugueses e indígenas." }
 ];
 
 let currentIndex = 0;
@@ -212,24 +222,46 @@ function renderizarLivros(lista) {
     if (!grid) return;
     grid.innerHTML = ""; 
 
+    if (lista.length === 0) {
+        grid.innerHTML = `<h2 style="width: 100%; text-align: center;">Nenhum livro</h2>`;
+        return;
+    }
+
+    const registros = JSON.parse(localStorage.getItem("registros") || "[]");
+
     lista.forEach(livro => {
+        const registrosDoLivro = registros.filter(r => r.livro === livro.titulo);
+        const ultimoRegistro = registrosDoLivro[registrosDoLivro.length - 1];
+
+        const disponivel = !ultimoRegistro || ultimoRegistro.troca !== "Empréstimo";
+
         const card = document.createElement("div");
         card.className = "card-livro";
-        card.onclick = () => verDetalhes(livro.id); 
         card.innerHTML = `
-            <img src="${livro.imagem}">
-            <strong>${livro.titulo}</strong><br>
-            <small>${livro.autor}</small>
+            <img src="${livro.imagem}" alt="${livro.titulo}" onclick="verDetalhes(${livro.id})" style="filter: ${disponivel ? 'none' : 'grayscale(1)'}">
+            <p><strong>${livro.titulo}</strong></p>
+            <p style="color: ${disponivel ? 'green' : 'red'}; font-weight: bold; margin: 5px 0;">
+                ${disponivel ? '● Disponível' : '○ Indisponível'}
+            </p>
         `;
         grid.appendChild(card);
     });
 }
 
+
 function filtrarLivros() {
     const genero = document.getElementById("filtroGenero").value;
-    const filtrados = genero === "todos" ? livrosDB : livrosDB.filter(l => l.genero === genero);
+    const termoPesquisa = document.getElementById("pesquisaNome").value.toLowerCase();
+    
+    const filtrados = livrosDB.filter(livro => {
+        const matchesGenero = (genero === "todos" || livro.genero === genero);
+        const matchesNome = livro.titulo.toLowerCase().includes(termoPesquisa);
+        return matchesGenero && matchesNome;
+    });
+
     renderizarLivros(filtrados);
 }
+
 
 function verDetalhes(id) {
     const livro = livrosDB.find(l => l.id === id);
