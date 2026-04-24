@@ -160,27 +160,55 @@ main {
 
 <script>
     document.addEventListener("DOMContentLoaded", () => {
-        const dadosLivro = localStorage.getItem("livroSelecionado");
+    const dadosLivro = localStorage.getItem("livroSelecionado");
 
-        if (dadosLivro) {
-            const livro = JSON.parse(dadosLivro);
-            
-            document.getElementById("titulo-livro").innerText = livro.titulo;
-            document.getElementById("capa-livro").src = livro.imagem;
-            document.getElementById("sinopse-livro").innerText = livro.sinopse;
+    if (dadosLivro) {
+        const livro = JSON.parse(dadosLivro);
+        
+        document.getElementById("titulo-livro").innerText = livro.titulo;
+        document.getElementById("capa-livro").src = livro.imagem;
+        document.getElementById("sinopse-livro").innerText = livro.sinopse;
+
+        const registros = JSON.parse(localStorage.getItem("registros") || "[]");
+        const registrosDoLivro = registros.filter(r => r.livro === livro.titulo);
+        const ultimoRegistro = registrosDoLivro[registrosDoLivro.length - 1];
+        const disponivel = !ultimoRegistro || ultimoRegistro.troca === "Devolução";
+
+        const statusDiv = document.querySelector(".status");
+        const btn = document.querySelector(".btn-emprestar");
+
+        if (disponivel) {
+            statusDiv.innerHTML = '<i class="fas fa-check-circle" style="color: green;">Disponível</i>';
+            btn.disabled = false;
+            btn.style.opacity = "1";
+            btn.style.cursor = "pointer";
         } else {
-            alert("Nenhum livro selecionado!");
-            window.location.href = "catalogo.html";
+            statusDiv.innerHTML = '<i class="fas fa-times-circle" style="color: red;">Indisponível</i>';
+            btn.disabled = true;
+            btn.style.backgroundColor = "#ccc";
+            btn.style.cursor = "not-allowed";
+            btn.innerText = "Indisponível";
         }
-    });
+    } else {
+        alert("Nenhum livro selecionado!");
+        window.location.href = "catalogo.html";
+    }
+});
 
 function irParaRegistro() {
+    const estaLogado = sessionStorage.getItem("logado") === "true";
+    
+    if (!estaLogado) {
+        alert("Acesso restrito a professores.");
+        window.location.href = "login.html";
+        return;
+    }
+
     const titulo = document.getElementById("titulo-livro").innerText;
-    
     localStorage.setItem("livroParaEmprestar", titulo);
-    
-    window.location.href = "registros.html"
+    window.location.href = "registros.html";
 }
+
 
 </script>
 
